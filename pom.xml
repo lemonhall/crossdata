@@ -16,9 +16,7 @@
   ~
   ~ You should have received a copy of the GNU Lesser General Public
   ~ License along with this library.
-  -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.stratio.meta</groupId>
@@ -86,12 +84,14 @@
         <module>meta-server</module>
         <module>meta-sh</module>
         <module>meta-dist</module>
-    </modules>
+        <module>meta-ssandreta</module>
+  </modules>
     <properties>
         <akka.version>2.2.4</akka.version>
         <cassandra.driver>2.0.0</cassandra.driver>
         <meta.version>0.0.5-SNAPSHOT</meta.version>
         <deep.version>0.2.7</deep.version>
+        <cassandra.version>2.0.0</cassandra.version>
         <coverage.data.dir>${project.build.outputDirectory}</coverage.data.dir>
     </properties>
 

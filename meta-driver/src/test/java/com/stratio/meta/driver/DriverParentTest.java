@@ -19,8 +19,10 @@
 
 package com.stratio.meta.driver;
 
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
 import com.stratio.meta.server.MetaServer;
-import org.testng.annotations.*;
 
 public class DriverParentTest extends ParentCassandraTest {
     private static final long SLEEP_TIME = 5000;
