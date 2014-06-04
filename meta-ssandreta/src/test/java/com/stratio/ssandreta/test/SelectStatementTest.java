@@ -19,8 +19,10 @@
 
 package com.stratio.ssandreta.test;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+
 
 public class SelectStatementTest extends BasicCoreCassandraTest {
 
@@ -28,12 +30,14 @@ public class SelectStatementTest extends BasicCoreCassandraTest {
     @BeforeClass
     public static void setUpBeforeClass(){
         BasicCoreCassandraTest.setUpBeforeClass();
-        BasicCoreCassandraTest.loadTestData("demo", "demoKeyspace.cql");
+        BasicCoreCassandraTest.loadTestData("demo", "/demoKeyspace.cql");
     }
 
     @Test
     public void simpleCassandraSelectTest(){
-    	
+    	System.out.println("llego a ejecutar test");
+    	_session.execute("SELECT * FROM demo.users");
     }
+    
     
 }
