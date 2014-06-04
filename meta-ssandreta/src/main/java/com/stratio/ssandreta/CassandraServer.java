@@ -1,6 +1,5 @@
 package com.stratio.ssandreta;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -20,7 +19,8 @@ import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.log4j.Logger;
 import org.apache.thrift.transport.TTransportException;
 
-import com.google.common.base.Charsets;
+import org.apache.commons.io.Charsets;
+
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
@@ -29,18 +29,20 @@ import com.google.common.io.Resources;
  * 
  * Copyright (c) 2010 Ran Tavory
  * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  * 
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  */
 class CassandraServer {
 
-	private static final Logger logger = Logger.getLogger(CassandraServer.class);
+	private static final Logger logger = Logger
+			.getLogger(CassandraServer.class);
 
 	private static final int WAIT_SECONDS = 3;
 
@@ -64,22 +66,25 @@ class CassandraServer {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void start() throws TTransportException, IOException, InterruptedException, ConfigurationException {
+	public void start() throws TTransportException, IOException,
+			InterruptedException, ConfigurationException {
 
 		File dir = Files.createTempDir();
 		String dirPath = dir.getAbsolutePath();
 		System.out.println("Storing Cassandra files in " + dirPath);
 
 		URL url = Resources.getResource("cassandra.yaml");
-		String yaml = Resources.toString(url, Charsets.UTF_8);
+		String yaml = Resources.toString(url, Charsets.UTF_8); // apache?
 		yaml = yaml.replaceAll("REPLACEDIR", dirPath);
 		String yamlPath = dirPath + File.separatorChar + "cassandra.yaml";
-		org.apache.commons.io.FileUtils.writeStringToFile(new File(yamlPath), yaml);
+		org.apache.commons.io.FileUtils.writeStringToFile(new File(yamlPath),
+				yaml);
 
 		// make a tmp dir and copy cassandra.yaml and log4j.properties to it
 		copy("/log4j.properties", dir.getAbsolutePath());
 		System.setProperty("cassandra.config", "file:" + dirPath + yamlFilePath);
-		System.setProperty("log4j.configuration", "file:" + dirPath + "/log4j.properties");
+		System.setProperty("log4j.configuration", "file:" + dirPath
+				+ "/log4j.properties");
 		System.setProperty("cassandra-foreground", "true");
 
 		cleanupAndLeaveDirs();
@@ -100,8 +105,10 @@ class CassandraServer {
 	}
 
 	public void shutdown() throws IOException {
+		cassandraDaemon.destroy();
 		executor.shutdown();
 		executor.shutdownNow();
+
 	}
 
 	/**
@@ -111,7 +118,8 @@ class CassandraServer {
 	 * @param directory
 	 * @throws IOException
 	 */
-	private static void copy(String resource, String directory) throws IOException {
+	private static void copy(String resource, String directory)
+			throws IOException {
 		mkdir(directory);
 		InputStream is = CassandraServer.class.getResourceAsStream(resource);
 		String fileName = resource.substring(resource.lastIndexOf("/") + 1);
@@ -152,7 +160,8 @@ class CassandraServer {
 			File dir = new File(dirName);
 			if (!dir.exists()) {
 				logger.error("No such directory: " + dir.getAbsolutePath());
-				throw new RuntimeException("No such directory: " + dir.getAbsolutePath());
+				throw new RuntimeException("No such directory: "
+						+ dir.getAbsolutePath());
 			}
 			FileUtils.deleteRecursive(dir);
 		}
@@ -163,7 +172,8 @@ class CassandraServer {
 			File dir = new File(dirName);
 			if (!dir.exists()) {
 				logger.error("No such directory: " + dir.getAbsolutePath());
-				throw new RuntimeException("No such directory: " + dir.getAbsolutePath());
+				throw new RuntimeException("No such directory: "
+						+ dir.getAbsolutePath());
 			}
 			FileUtils.deleteRecursive(dir);
 		}
@@ -178,6 +188,7 @@ class CassandraServer {
 		public void run() {
 			cassandraDaemon = new CassandraDaemon();
 			cassandraDaemon.activate();
+
 		}
 	}
 }

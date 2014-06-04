@@ -1,4 +1,3 @@
-package com.stratio.ssandreta.test;
 /*
  * Stratio Meta
  *
@@ -18,16 +17,7 @@ package com.stratio.ssandreta.test;
  * License along with this library.
  */
 
-
-
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.KeyspaceMetadata;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.exceptions.InvalidQueryException;
-import org.apache.log4j.Logger;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+package com.stratio.ssandreta.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,10 +26,21 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
+import com.stratio.ssandreta.BaseMetaTest;
+
 import static org.testng.Assert.assertTrue;
 
 
-public class BasicCoreCassandraTest {
+public class BasicCoreCassandraTest extends BaseMetaTest  {
 
     /**
      * Default Cassandra HOST using 127.0.0.1.
@@ -56,8 +57,11 @@ public class BasicCoreCassandraTest {
      */
     private static final Logger logger = Logger.getLogger(BasicCoreCassandraTest.class);
 
+
+    
     @BeforeClass
     public static void setUpBeforeClass(){
+  
         initCassandraConnection();
         dropKeyspaceIfExists("testKS");
     }
