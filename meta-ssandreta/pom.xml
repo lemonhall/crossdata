@@ -28,9 +28,9 @@
 			<version>2.4</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.cassandra</groupId>
+			<groupId>com.stratio.cassandra</groupId>
 			<artifactId>cassandra-all</artifactId>
-			<version>2.0.4</version>
+			<version>2.0.71</version>
 			<!-- <exclusions> -->
 			<!-- <exclusion> -->
 			<!-- <artifactId>snakeyaml</artifactId> -->

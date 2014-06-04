@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results skipped="0" failed="0" total="0" passed="0">
+<testng-results skipped="1" failed="0" total="1" passed="0">
   <reporter-output>
   </reporter-output>
-  <suite name="Default suite" duration-ms="7" started-at="2014-06-04T10:16:42Z" finished-at="2014-06-04T10:16:42Z">
+  <suite name="Default suite" duration-ms="17" started-at="2014-06-04T15:06:42Z" finished-at="2014-06-04T15:06:42Z">
     <groups>
     </groups>
-    <test name="Default test" duration-ms="7" started-at="2014-06-04T10:16:42Z" finished-at="2014-06-04T10:16:42Z">
+    <test name="Default test" duration-ms="17" started-at="2014-06-04T15:06:42Z" finished-at="2014-06-04T15:06:42Z">
       <class name="com.stratio.ssandreta.test.SelectStatementTest">
-        <test-method status="FAIL" signature="setup()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@114662e3]" name="setup" is-config="true" duration-ms="0" started-at="2014-06-04T12:16:42Z" finished-at="2014-06-04T12:16:42Z">
+        <test-method status="FAIL" signature="setup()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@53533bdf]" name="setup" is-config="true" duration-ms="0" started-at="2014-06-04T17:06:41Z" finished-at="2014-06-04T17:06:41Z">
           <exception class="java.lang.NoSuchMethodError">
             <message>
               <![CDATA[org.yaml.snakeyaml.constructor.Constructor.setPropertyUtils(Lorg/yaml/snakeyaml/introspector/PropertyUtils;)V]]>
@@ -20,7 +20,6 @@
 	at com.stratio.ssandreta.CassandraServer.mkdirs(CassandraServer.java:183)
 	at com.stratio.ssandreta.CassandraServer.cleanupAndLeaveDirs(CassandraServer.java:148)
 	at com.stratio.ssandreta.CassandraServer.start(CassandraServer.java:90)
-	at com.stratio.ssandreta.MainTest.startCassandra(MainTest.java:35)
 	at com.stratio.ssandreta.BaseMetaTest.setup(BaseMetaTest.java:14)
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
@@ -46,7 +45,19 @@
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setup -->
-        <test-method status="SKIP" signature="closeAndClean()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@114662e3]" name="closeAndClean" is-config="true" duration-ms="0" started-at="2014-06-04T12:16:42Z" finished-at="2014-06-04T12:16:42Z">
+        <test-method status="SKIP" signature="setUpBeforeClass()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@53533bdf]" name="setUpBeforeClass" is-config="true" duration-ms="0" started-at="2014-06-04T17:06:42Z" finished-at="2014-06-04T17:06:42Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setUpBeforeClass -->
+        <test-method status="SKIP" signature="simpleCassandraSelectTest()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@53533bdf]" name="simpleCassandraSelectTest" duration-ms="1" started-at="2014-06-04T17:06:42Z" finished-at="2014-06-04T17:06:42Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- simpleCassandraSelectTest -->
+        <test-method status="SKIP" signature="tearDownAfterClass()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@53533bdf]" name="tearDownAfterClass" is-config="true" duration-ms="0" started-at="2014-06-04T17:06:42Z" finished-at="2014-06-04T17:06:42Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- tearDownAfterClass -->
+        <test-method status="SKIP" signature="closeAndClean()[pri:0, instance:com.stratio.ssandreta.test.SelectStatementTest@53533bdf]" name="closeAndClean" is-config="true" duration-ms="0" started-at="2014-06-04T17:06:42Z" finished-at="2014-06-04T17:06:42Z">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- closeAndClean -->

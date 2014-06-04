@@ -35,8 +35,8 @@ public class SelectStatementTest extends BasicCoreCassandraTest {
 
     @Test
     public void simpleCassandraSelectTest(){
-    	System.out.println("llego a ejecutar test");
     	_session.execute("SELECT * FROM demo.users");
+    	System.out.println("llego a ejecutar test");
     }
     
     
