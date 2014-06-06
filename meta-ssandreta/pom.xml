@@ -8,7 +8,7 @@
 	<groupId>com.stratio.meta</groupId>
 	<artifactId>meta-ssandreta</artifactId>
 	<version>0.0.5-SNAPSHOT</version>
-	<name>meta-ssandreta</name>
+	<name>Stratio META embedded Cassandra</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,10 +18,7 @@
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
 			<version>6.8.8</version>
-<!-- 			<scope>test</scope> -->
 		</dependency>
-		<!-- <dependency> <groupId>org.yaml</groupId> <artifactId>snakeyaml</artifactId> 
-			<version>1.12</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>org.apache.directory.studio</groupId>
 			<artifactId>org.apache.commons.io</artifactId>
@@ -31,19 +28,12 @@
 			<groupId>com.stratio.cassandra</groupId>
 			<artifactId>cassandra-all</artifactId>
 			<version>2.0.72</version>
-			<!-- <exclusions> -->
-			<!-- <exclusion> -->
-			<!-- <artifactId>snakeyaml</artifactId> -->
-			<!-- <groupId>org.yaml</groupId> -->
-			<!-- </exclusion> -->
-			<!-- </exclusions> -->
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
 			<artifactId>cassandra-driver-core</artifactId>
 			<version>2.0.2</version>
 		</dependency>
-
 	</dependencies>
 	<build>
 		<plugins>
