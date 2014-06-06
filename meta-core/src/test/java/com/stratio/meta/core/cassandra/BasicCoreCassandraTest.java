@@ -25,7 +25,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.exceptions.InvalidQueryException;
 import com.stratio.meta.core.parser.Parser;
-import com.stratio.meta.test.CCMHandler;
+import com.stratio.meta.test.EmbeddedCassandraHandler;
 import org.apache.log4j.Logger;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -64,7 +64,7 @@ public class BasicCoreCassandraTest {
 
     @BeforeClass
     public static void setUpBeforeClass(){
-        CCMHandler.startCCM();
+    	EmbeddedCassandraHandler.startEmbeddedCassandra();
         initCassandraConnection();
         dropKeyspaceIfExists("testKS");
     }

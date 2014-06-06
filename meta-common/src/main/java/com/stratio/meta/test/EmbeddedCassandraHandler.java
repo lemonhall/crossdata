@@ -51,7 +51,7 @@ public class EmbeddedCassandraHandler {
         BufferedReader in = null;
         try {
             File tempFile = File.createTempFile("stratio-embedded-cassandra-start",".sh");
-            InputStream resourceStream = EmbeddedCassandraHandler.class.getResourceAsStream("/com/stratio/meta/test/test.sh");
+            InputStream resourceStream = EmbeddedCassandraHandler.class.getResourceAsStream("/com/stratio/meta/test/cassandraEmbedded.sh");
             FileUtils.copyInputStreamToFile(resourceStream,tempFile);
             tempFile.setExecutable(true);
 

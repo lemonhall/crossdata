@@ -26,7 +26,7 @@
 CURRENTDIR=$(pwd)
 
 cd */stratio-meta/meta-ssandreta
-mvn exec:java -Dexec.mainClass="com.stratio.ssandreta.Main"
+mvn exec:java -Dexec.mainClass="com.stratio.ssandreta.Main" &
 
 #Go to inital directory
 cd ${CURRENTDIR}

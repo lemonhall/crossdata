@@ -29,6 +29,7 @@ import java.net.URL
 import java.util
 import java.io.IOException
 import scala.collection.mutable.MutableList
+import com.stratio.meta.test.EmbeddedCassandraHandler
 
 trait BeforeAndAfterCassandra extends BeforeAndAfterAll {
   this:Suite =>
@@ -153,7 +154,7 @@ trait BeforeAndAfterCassandra extends BeforeAndAfterAll {
 
   override def beforeAll(): Unit = {
     beforeCassandraStart()
-    CCMHandler.startCCM()
+    EmbeddedCassandraHandler.startEmbeddedCassandra()
     afterCassandraStart()
   }
 

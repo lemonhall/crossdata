@@ -15,7 +15,7 @@ import scala.sys.process._
 import java.io.File
 
 class QueryActorTest{
-
+  
   val logger: Logger = Logger.getLogger(classOf[Result])
   val system: ActorSystem = ActorSystem.create("TestSystem")
   val engineConfig: EngineConfig = {
@@ -27,7 +27,6 @@ class QueryActorTest{
     result
   }
   lazy val engine: Engine = new Engine(engineConfig)
-
 
   @AfterClass
   def tearDownAfterClass(){

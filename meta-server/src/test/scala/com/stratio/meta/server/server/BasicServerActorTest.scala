@@ -30,11 +30,14 @@ import org.testng.Assert._
 import com.stratio.meta.server.utilities._
 import com.stratio.meta.server.config.BeforeAndAfterCassandra
 import scala.collection
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
 
 
 /**
  * To generate unit test of query actor
  */
+@RunWith(classOf[JUnitRunner])
 class BasicServerActorTest extends TestKit(ActorSystem("TestKitUsageSpec",ConfigFactory.parseString(TestKitUsageSpec.config)))
 with DefaultTimeout with FunSuiteLike with BeforeAndAfterCassandra
 {
