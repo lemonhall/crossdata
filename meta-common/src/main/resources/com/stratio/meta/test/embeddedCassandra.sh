@@ -20,9 +20,12 @@
 # Stratio Meta CCM Test
 # 
 # PRE: Git, pyYaml module for python, Ant
+pgrep -f ssandr
+if [ $? -eq 0 ]; then
 CURRENT_DIR=$(pwd)
 COMPLETE_DIR="`locate meta-ssandreta/pom.xml`"
 DIR_NAME="`dirname $COMPLETE_DIR`"
 cd $DIR_NAME
 nohup mvn exec:java -Dexec.mainClass="com.stratio.ssandreta.Main" &
 cd ${CURRENT_DIR}
+fi
