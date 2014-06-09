@@ -280,4 +280,68 @@ public class SelectStatementTest extends BasicValidatorTest {
 
     validateFail(inputText, "testValidateBasicBetweenClauseWithMixedDataTypeFail");
   }
+
+  @Test
+  public void testValidateGroupByClauseCountOk() {
+
+    String inputText = "SELECT users.gender, COUNT(*) FROM demo.users GROUP BY users.gender;";
+
+    validateOk(inputText, "testValidateGroupByClauseCountOk");
+  }
+
+  @Test
+  public void testValidateGroupByClauseSumOk() {
+
+    String inputText = "SELECT users.gender, SUM(age) FROM demo.users GROUP BY users.gender;";
+
+    validateOk(inputText, "testValidateGroupByClauseSumOk");
+  }
+
+  @Test
+  public void testValidateGroupMissingFieldFail() {
+
+    String inputText = "SELECT SUM(age) FROM demo.users GROUP BY users.gender;";
+
+    validateFail(inputText, "testValidateGroupByWrongSumClauseFail");
+  }
+
+  @Test
+  public void testValidateSimpleOrderByOk() {
+
+    String inputText = "SELECT * FROM demo.users ORDER BY age;";
+
+    validateOk(inputText, "testValidateSimpleOrderByOk");
+  }
+
+  @Test
+  public void testValidateMultipleOrderByOk() {
+
+    String inputText = "SELECT * FROM demo.users ORDER BY gender, age;";
+
+    validateOk(inputText, "testValidateMultipleOrderByOk");
+  }
+
+  @Test
+  public void testValidateSimpleOrderByWithTableOk() {
+
+    String inputText = "SELECT * FROM demo.users ORDER BY users.age;";
+
+    validateOk(inputText, "testValidateSimpleOrderByOk");
+  }
+
+  @Test
+  public void testValidateSimpleOrderByUnknownFieldFail() {
+
+    String inputText = "SELECT * FROM demo.users ORDER BY unknown;";
+
+    validateFail(inputText, "testValidateSimpleOrderByUnknownFieldFail");
+  }
+
+  @Test
+  public void testValidateMultipleOrderByUnknownFieldFail() {
+
+    String inputText = "SELECT * FROM demo.users ORDER BY gender, unknown;";
+
+    validateFail(inputText, "testValidateSimpleOrderByUnknownFieldFail");
+  }
 }

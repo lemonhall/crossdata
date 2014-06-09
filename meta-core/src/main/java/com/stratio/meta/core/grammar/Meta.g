@@ -98,10 +98,12 @@ T_TRUNCATE: T R U N C A T E;
 T_CREATE: C R E A T E;
 T_ALTER: A L T E R;
 T_KEYSPACE: K E Y S P A C E;
+T_KEYSPACES: K E Y S P A C E S;
 T_NOT: N O T;
 T_WITH: W I T H;
 T_DROP: D R O P;
 T_TABLE: T A B L E;
+T_TABLES: T A B L E S;
 T_IF: I F;
 T_EXISTS: E X I S T S;
 T_AND: A N D;
@@ -189,6 +191,7 @@ T_INTERROGATION: '?';
 T_ASTERISK: '*';
 T_GROUP: G R O U P;
 T_AGGREGATION: A G G R E G A T I O N;
+T_SUM: S U M;
 T_MAX: M A X;
 T_MIN: M I N;
 T_AVG: A V G;
@@ -233,7 +236,10 @@ T_PATH: (LETTER | DIGIT | '_' | POINT | '-' | '/')+;
 
 describeStatement returns [DescribeStatement descs]:
     T_DESCRIBE (T_KEYSPACE keyspace=T_IDENT { $descs = new DescribeStatement(DescribeType.KEYSPACE); $descs.setKeyspace($keyspace.text);}
+    	| T_KEYSPACE {$descs = new DescribeStatement(DescribeType.KEYSPACE);}
+    	| T_KEYSPACES {$descs = new DescribeStatement(DescribeType.KEYSPACES);}
         | T_TABLE tablename=getTableID { $descs = new DescribeStatement(DescribeType.TABLE); $descs.setTableName(tablename);}
+        | T_TABLES {$descs = new DescribeStatement(DescribeType.TABLES);}
     )
 ;
 
@@ -686,8 +692,8 @@ getOrdering returns [ArrayList<Ordering> order]
         order = new ArrayList<>();
         Ordering ordering;
     }:
-    ident1=T_IDENT {ordering = new Ordering($ident1.text);} (T_ASC {ordering.setOrderDir(OrderDirection.ASC);} | T_DESC {ordering.setOrderDir(OrderDirection.DESC);})? {order.add(ordering);}
-    (T_COMMA identN=T_IDENT {ordering = new Ordering($identN.text);} (T_ASC {ordering.setOrderDir(OrderDirection.ASC);} | T_DESC {ordering.setOrderDir(OrderDirection.DESC);})? {order.add(ordering);})*
+    ident1=(T_KS_AND_TN | T_IDENT) {ordering = new Ordering($ident1.text);} (T_ASC {ordering.setOrderDir(OrderDirection.ASC);} | T_DESC {ordering.setOrderDir(OrderDirection.DESC);})? {order.add(ordering);}
+    (T_COMMA identN=(T_KS_AND_TN | T_IDENT) {ordering = new Ordering($identN.text);} (T_ASC {ordering.setOrderDir(OrderDirection.ASC);} | T_DESC {ordering.setOrderDir(OrderDirection.DESC);})? {order.add(ordering);})*
 ;
 
 getWhereClauses returns [ArrayList<Relation> clauses]
@@ -738,7 +744,7 @@ getSelectionCount returns [SelectionCount scc]
         boolean identInc = false;
         char symbol = '*';
     }:
-    T_COUNT T_START_PARENTHESIS ( symbolStr=getCountSymbol { symbol=symbolStr.charAt(0); } ) T_END_PARENTHESIS
+    T_COUNT T_START_PARENTHESIS symbolStr=getCountSymbol { symbol=symbolStr.charAt(0); } T_END_PARENTHESIS
     (T_AS {identInc = true;} ident=T_IDENT )? 
     {
         if(identInc)
@@ -749,7 +755,7 @@ getSelectionCount returns [SelectionCount scc]
 ;
 
 getCountSymbol returns [String str]:
-    T_ASTERISK {$str = new String("*");}
+    '*' {$str = new String("*");}
     | '1' {$str = new String("1");}
     ;
 
@@ -779,15 +785,17 @@ getSelector returns [SelectorMeta slmt]
         ArrayList<SelectorMeta> params = new ArrayList<>();
         GroupByFunction gbFunc = null;
     }:
-    ( (T_AGGREGATION {gbFunc = GroupByFunction.AGGREGATION;}
+    ( (T_SUM {gbFunc = GroupByFunction.SUM;}
        | T_MAX {gbFunc = GroupByFunction.MAX;}
        | T_MIN {gbFunc = GroupByFunction.MIN;}
        | T_AVG {gbFunc = GroupByFunction.AVG;}
        | T_COUNT {gbFunc = GroupByFunction.COUNT;}
       ) 
             T_START_PARENTHESIS 
-                (select1=getSelector {params.add(select1);} (T_COMMA selectN=getSelector {params.add(selectN);})*)? 
-            T_END_PARENTHESIS {$slmt = new SelectorGroupBy(gbFunc, params);}
+                (select1=getSelector {params.add(select1);}
+                | T_ASTERISK {params.add(new SelectorIdentifier("*"));}
+                )?
+            T_END_PARENTHESIS {$slmt = new SelectorGroupBy(gbFunc, params.get(0));}
         | (identID=getTableID | luceneID=T_LUCENE) (
             {if (identID != null) $slmt = new SelectorIdentifier(identID); else $slmt = new SelectorIdentifier($luceneID.text);}
             | T_START_PARENTHESIS (select1=getSelector {params.add(select1);} (T_COMMA selectN=getSelector {params.add(selectN);})*)? 

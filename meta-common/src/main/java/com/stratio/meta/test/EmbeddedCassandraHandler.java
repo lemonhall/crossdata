@@ -51,12 +51,11 @@ public class EmbeddedCassandraHandler {
         BufferedReader in = null;
         try {
             File tempFile = File.createTempFile("stratio-embedded-cassandra-start",".sh");
-            InputStream resourceStream = EmbeddedCassandraHandler.class.getResourceAsStream("/com/stratio/meta/test/cassandraEmbedded.sh");
+            InputStream resourceStream = EmbeddedCassandraHandler.class.getResourceAsStream("/com/stratio/meta/test/embeddedCassandra.sh");
             FileUtils.copyInputStreamToFile(resourceStream,tempFile);
             tempFile.setExecutable(true);
-
-            Process p = Runtime.getRuntime().exec(tempFile.getAbsolutePath());
-
+            String path = tempFile.getAbsolutePath();
+            Process p = Runtime.getRuntime().exec(path);
             in = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.forName("UTF-8")));
 
             String line;

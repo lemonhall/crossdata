@@ -21,12 +21,8 @@
 # 
 # PRE: Git, pyYaml module for python, Ant
 
+COMPLETE_DIR="`locate meta-ssandreta/pom.xml`"
+DIR_NAME="`dirname $COMPLETE_DIR`"
+cd $DIR_NAME
+nohup mvn exec:java -Dexec.mainClass="com.stratio.ssandreta.Main" &
 
-
-CURRENTDIR=$(pwd)
-
-cd */stratio-meta/meta-ssandreta
-mvn exec:java -Dexec.mainClass="com.stratio.ssandreta.Main" &
-
-#Go to inital directory
-cd ${CURRENTDIR}

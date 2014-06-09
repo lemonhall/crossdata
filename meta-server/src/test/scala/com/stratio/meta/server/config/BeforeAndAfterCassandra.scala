@@ -20,7 +20,6 @@
 package com.stratio.meta.server.config
 
 import org.scalatest.{Suite, BeforeAndAfterAll}
-import com.stratio.meta.test.CCMHandler
 import com.datastax.driver.core._
 import org.testng.Assert._
 import org.apache.log4j.Logger

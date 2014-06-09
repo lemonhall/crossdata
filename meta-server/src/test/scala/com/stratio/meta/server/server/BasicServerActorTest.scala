@@ -37,7 +37,6 @@ import org.scalatest.junit.JUnitRunner
 /**
  * To generate unit test of query actor
  */
-@RunWith(classOf[JUnitRunner])
 class BasicServerActorTest extends TestKit(ActorSystem("TestKitUsageSpec",ConfigFactory.parseString(TestKitUsageSpec.config)))
 with DefaultTimeout with FunSuiteLike with BeforeAndAfterCassandra
 {

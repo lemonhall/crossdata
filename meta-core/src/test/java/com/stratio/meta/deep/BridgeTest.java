@@ -22,6 +22,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.datastax.driver.core.ResultSet;
 import com.stratio.deep.context.DeepSparkContext;
 import com.stratio.meta.common.data.CassandraResultSet;
 import com.stratio.meta.common.data.Row;
@@ -42,6 +42,8 @@ import com.stratio.meta.core.engine.EngineConfig;
 import com.stratio.meta.core.executor.Executor;
 import com.stratio.meta.core.metadata.MetadataManager;
 import com.stratio.meta.core.statements.SelectStatement;
+import com.stratio.meta.core.structures.GroupBy;
+import com.stratio.meta.core.structures.GroupByFunction;
 import com.stratio.meta.core.structures.InnerJoin;
 import com.stratio.meta.core.structures.IntegerTerm;
 import com.stratio.meta.core.structures.LongTerm;
@@ -56,6 +58,7 @@ import com.stratio.meta.core.structures.SelectionClause;
 import com.stratio.meta.core.structures.SelectionList;
 import com.stratio.meta.core.structures.SelectionSelector;
 import com.stratio.meta.core.structures.SelectionSelectors;
+import com.stratio.meta.core.structures.SelectorGroupBy;
 import com.stratio.meta.core.structures.SelectorIdentifier;
 import com.stratio.meta.core.structures.StringTerm;
 import com.stratio.meta.core.structures.Term;
@@ -100,7 +103,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
     return engineConfig;
   }
 
-  public Result validateOk(MetaQuery metaQuery, String methodName) {
+  private Result validateOk(MetaQuery metaQuery, String methodName) {
     MetaQuery result = executor.executeQuery(metaQuery);
     CassandraResultSet cassandraResultSet =
         ((CassandraResultSet) ((QueryResult) result.getResult()).getResultSet());
@@ -110,7 +113,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
     return result.getResult();
   }
 
-  public Result validateRows(MetaQuery metaQuery, String methodName, int expectedNumber) {
+  private Result validateRows(MetaQuery metaQuery, String methodName, int expectedNumber) {
     QueryResult result = (QueryResult) validateOk(metaQuery, methodName);
     if (expectedNumber > 0) {
       assertFalse(result.getResultSet().isEmpty(), "Expecting non-empty resultset");
@@ -123,7 +126,25 @@ public class BridgeTest extends BasicCoreCassandraTest {
     return result;
   }
 
-  public void validateFail(MetaQuery metaQuery, String methodName) {
+  private Result validateRowsAndCols(MetaQuery metaQuery, String methodName, int expectedRows,
+      int expectedCols) {
+    QueryResult result = (QueryResult) validateOk(metaQuery, methodName);
+    if (expectedRows > 0) {
+      assertFalse(result.getResultSet().isEmpty(), "Expecting non-empty resultset");
+      assertEquals(result.getResultSet().size(), expectedRows, methodName + ":"
+          + result.getResultSet().size() + " rows found, " + expectedRows + " rows expected.");
+
+      Row firstRow = result.getResultSet().iterator().next();
+      assertEquals(firstRow.getCellList().size(), expectedCols, methodName + ":"
+          + firstRow.getCellList().size() + " cols found, " + expectedCols + " cols expected.");
+    } else {
+      assertTrue(result.getResultSet().isEmpty(), "Expecting empty resultset.");
+    }
+
+    return result;
+  }
+
+  private void validateFail(MetaQuery metaQuery, String methodName) {
     try {
       executor.executeQuery(metaQuery);
     } catch (Exception ex) {
@@ -657,6 +678,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
 
     SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");
     firstSelect.setWhere(clause);
+    firstSelect.validate(metadataManager);
 
     // Query execution
     Tree tree = new Tree();
@@ -690,6 +712,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
 
     SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");
     firstSelect.setWhere(clause);
+    firstSelect.validate(metadataManager);
 
     // Query execution
     Tree tree = new Tree();
@@ -723,6 +746,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
 
     SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");
     firstSelect.setWhere(clause);
+    firstSelect.validate(metadataManager);
 
     // Query execution
     Tree tree = new Tree();
@@ -753,6 +777,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
 
     SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");
     firstSelect.setWhere(clause);
+    firstSelect.validate(metadataManager);
 
     // Query execution
     Tree tree = new Tree();
@@ -788,25 +813,6 @@ public class BridgeTest extends BasicCoreCassandraTest {
     metaQuery.setPlan(tree);
     metaQuery.setStatus(QueryStatus.PLANNED);
     QueryResult result = (QueryResult) validateOk(metaQuery, "testNotEqual");
-    // /////////////////////////////////////////////////////////////////////////
-    ResultSet result2 = _session.execute("SELECT name, age FROM demo.users;");
-    System.out.println("-------CASSANDRA-------");
-    for (com.datastax.driver.core.Row row : result2.all()) {
-      System.out.print(" | " + row.getString("name"));
-      System.out.print(" | " + row.getInt("age"));
-      System.out.println(" | ");
-    }
-    System.out.println("------------------");
-    // /////////////////////////////////////////////////////////////////////////
-    System.out.println("-------METARESULT-------");
-    for (Row row : result.getResultSet()) {
-      for (String key : row.getCells().keySet()) {
-        System.out.print(" | " + row.getCell(key).getValue());
-      }
-      System.out.println(" | ");
-    }
-    System.out.println("------------------");
-    // /////////////////////////////////////////////////////////////////////////
     assertEquals(result.getResultSet().size(), 15);
   }
 
@@ -831,6 +837,7 @@ public class BridgeTest extends BasicCoreCassandraTest {
 
     SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");
     firstSelect.setWhere(clause);
+    firstSelect.validate(metadataManager);
 
     // Query execution
     Tree tree = new Tree();
@@ -838,6 +845,235 @@ public class BridgeTest extends BasicCoreCassandraTest {
     metaQuery.setPlan(tree);
     metaQuery.setStatus(QueryStatus.PLANNED);
     Result results = validateRows(metaQuery, "testBasicBetweenClauseWithIntegerData", 10);
+
+    results.toString();
+  }
+
+  @Test
+  public void testBasicGroupByClauseOk() {
+
+    MetaQuery metaQuery =
+        new MetaQuery(
+            "SELECT users.gender,count(*),sum(users.age) FROM demo.users GROUP BY users.gender;");
+
+    List<SelectionSelector> selectionSelectors =
+        Arrays.asList(new SelectionSelector(new SelectorIdentifier("users.gender")),
+            new SelectionSelector(new SelectorGroupBy(GroupByFunction.COUNT,
+                new SelectorIdentifier("*"))), new SelectionSelector(new SelectorGroupBy(
+                GroupByFunction.SUM, new SelectorIdentifier("users.age"))));
+
+    SelectionClause selClause = new SelectionList(new SelectionSelectors(selectionSelectors));
+    GroupBy groupClause = new GroupBy(Arrays.asList("users.gender"));
+
+    SelectStatement firstSelect = new SelectStatement(selClause, "demo.users");
+    firstSelect.setGroup(groupClause);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    Result results = validateRowsAndCols(metaQuery, "testBasicGroupByClauseOk", 2, 3);
+
+    results.toString();
+  }
+
+  @Test
+  public void testFullGroupByClauseOk() {
+
+    MetaQuery metaQuery =
+        new MetaQuery(
+            "SELECT users.gender,count(*),sum(users.age),avg(users.age),min(users.age),max(users.age) FROM demo.users GROUP BY users.gender;");
+
+    List<SelectionSelector> selectionSelectors =
+        Arrays.asList(new SelectionSelector(new SelectorIdentifier("users.gender")),
+            new SelectionSelector(new SelectorGroupBy(GroupByFunction.COUNT,
+                new SelectorIdentifier("*"))), new SelectionSelector(new SelectorGroupBy(
+                GroupByFunction.SUM, new SelectorIdentifier("users.age"))), new SelectionSelector(
+                new SelectorGroupBy(GroupByFunction.AVG, new SelectorIdentifier("users.age"))),
+            new SelectionSelector(new SelectorGroupBy(GroupByFunction.MIN, new SelectorIdentifier(
+                "users.age"))), new SelectionSelector(new SelectorGroupBy(GroupByFunction.MAX,
+                new SelectorIdentifier("users.age"))));
+
+    SelectionClause selClause = new SelectionList(new SelectionSelectors(selectionSelectors));
+    GroupBy groupClause = new GroupBy(Arrays.asList("users.gender"));
+
+    SelectStatement firstSelect = new SelectStatement(selClause, "demo.users");
+    firstSelect.setGroup(groupClause);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    Result results = validateRowsAndCols(metaQuery, "testFullGroupByClauseOk", 2, 6);
+
+    results.toString();
+  }
+
+  @Test
+  public void testGroupByWithWrongAggregationFunctionFail() {
+
+    MetaQuery metaQuery =
+        new MetaQuery(
+            "SELECT users.gender,sum(users.gender) FROM demo.users GROUP BY users.gender;");
+
+    List<SelectionSelector> selectionSelectors =
+        Arrays.asList(new SelectionSelector(new SelectorIdentifier("users.gender")),
+            new SelectionSelector(new SelectorGroupBy(GroupByFunction.SUM, new SelectorIdentifier(
+                "users.gender"))));
+
+    SelectionClause selClause = new SelectionList(new SelectionSelectors(selectionSelectors));
+    GroupBy groupClause = new GroupBy(Arrays.asList("users.gender"));
+
+    SelectStatement firstSelect = new SelectStatement(selClause, "demo.users");
+    firstSelect.setGroup(groupClause);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    validateFail(metaQuery, "testGroupByWithWrongAggregationFunctionFail");
+  }
+
+  @Test
+  public void testGroupByWithMissingSelectorFieldFail() {
+
+    MetaQuery metaQuery =
+        new MetaQuery("SELECT sum(users.age) FROM demo.users GROUP BY users.gender;");
+
+    List<SelectionSelector> selectionSelectors =
+        Arrays.asList(new SelectionSelector(new SelectorGroupBy(GroupByFunction.SUM,
+            new SelectorIdentifier("users.age"))));
+
+    SelectionClause selClause = new SelectionList(new SelectionSelectors(selectionSelectors));
+    GroupBy groupClause = new GroupBy(Arrays.asList("users.gender"));
+
+    SelectStatement firstSelect = new SelectStatement(selClause, "demo.users");
+    firstSelect.setGroup(groupClause);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    validateFail(metaQuery, "testGroupByWithMissingSelectorFieldFail");
+  }
+
+  @Test
+  public void testSelectAllOk() {
+
+    MetaQuery metaQuery =
+        new MetaQuery("SELECT * FROM demo.users WHERE email = 'name_2@domain.com';");
+
+    // Fields to retrieve
+    SelectionClause selectionClause = new SelectionList(new SelectionAsterisk());
+
+    // Where clause
+    List<Relation> clause = new ArrayList<>();
+    Relation relation = new RelationCompare("email", "=", new StringTerm("name_2@domain.com"));
+    clause.add(relation);
+    SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");;
+    firstSelect.setLimit(10000);
+    firstSelect.setWhere(clause);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    Result results = validateRowsAndCols(metaQuery, "testSelectAllOk", 1, 6);
+
+    results.toString();
+  }
+
+  @Test
+  public void testSimpleOrderByOk() {
+
+    MetaQuery metaQuery = new MetaQuery("SELECT * FROM demo.users ORDER BY users.age;");
+
+    // Fields to retrieve
+    SelectionClause selectionClause = new SelectionList(new SelectionAsterisk());
+
+    // Order by clause
+    List<Ordering> orderFieldsList = new ArrayList<>();
+    Ordering order = new Ordering("users.age");
+    orderFieldsList.add(order);
+
+    SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");;
+    firstSelect.setLimit(10000);
+    firstSelect.setOrder(orderFieldsList);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    Result results = validateRowsAndCols(metaQuery, "testSimpleOrderByOk", 16, 6);
+
+    results.toString();
+  }
+
+  @Test
+  public void testMultipleOrderByOk() {
+
+    MetaQuery metaQuery =
+        new MetaQuery("SELECT * FROM demo.users ORDER BY users.gender, users.age;");
+
+    // Fields to retrieve
+    SelectionClause selectionClause = new SelectionList(new SelectionAsterisk());
+
+    // Order by clause
+    List<Ordering> orderFieldsList = new ArrayList<>();
+    orderFieldsList.add(new Ordering("users.gender"));
+    orderFieldsList.add(new Ordering("users.age"));
+
+    SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");;
+    firstSelect.setLimit(10000);
+    firstSelect.setOrder(orderFieldsList);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    Result results = validateRowsAndCols(metaQuery, "testMultipleOrderByOk", 16, 6);
+
+    results.toString();
+  }
+
+  @Test
+  public void testComplexQueryWithSimpleOrderByOk() {
+
+    MetaQuery metaQuery = new MetaQuery("SELECT * FROM demo.users ORDER BY users.name;");
+
+    // Fields to retrieve
+    SelectionClause selectionClause = new SelectionList(new SelectionAsterisk());
+
+    // Order by clause
+    List<Ordering> orderFieldsList = new ArrayList<>();
+    orderFieldsList.add(new Ordering("users.gender"));
+    orderFieldsList.add(new Ordering("users.age"));
+
+    SelectStatement firstSelect = new SelectStatement(selectionClause, "demo.users");;
+    firstSelect.setLimit(10000);
+    firstSelect.setOrder(orderFieldsList);
+    firstSelect.validate(metadataManager);
+
+    // Query execution
+    Tree tree = new Tree();
+    tree.setNode(new MetaStep(MetaPath.DEEP, firstSelect));
+    metaQuery.setPlan(tree);
+    metaQuery.setStatus(QueryStatus.PLANNED);
+    Result results = validateRowsAndCols(metaQuery, "testMultipleOrderByOk", 16, 6);
 
     results.toString();
   }

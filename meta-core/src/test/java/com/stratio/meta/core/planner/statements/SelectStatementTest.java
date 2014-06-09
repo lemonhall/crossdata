@@ -26,8 +26,11 @@ import org.testng.annotations.Test;
 
 import com.stratio.meta.core.planner.BasicPlannerTest;
 import com.stratio.meta.core.statements.SelectStatement;
+import com.stratio.meta.core.structures.GroupBy;
+import com.stratio.meta.core.structures.GroupByFunction;
 import com.stratio.meta.core.structures.InnerJoin;
 import com.stratio.meta.core.structures.LongTerm;
+import com.stratio.meta.core.structures.Ordering;
 import com.stratio.meta.core.structures.Relation;
 import com.stratio.meta.core.structures.RelationBetween;
 import com.stratio.meta.core.structures.RelationCompare;
@@ -37,6 +40,7 @@ import com.stratio.meta.core.structures.SelectionClause;
 import com.stratio.meta.core.structures.SelectionList;
 import com.stratio.meta.core.structures.SelectionSelector;
 import com.stratio.meta.core.structures.SelectionSelectors;
+import com.stratio.meta.core.structures.SelectorGroupBy;
 import com.stratio.meta.core.structures.SelectorIdentifier;
 import com.stratio.meta.core.structures.StringTerm;
 import com.stratio.meta.core.structures.Term;
@@ -172,7 +176,7 @@ public class SelectStatementTest extends BasicPlannerTest {
     List<Relation> whereClause = Arrays.asList(relation1, relation2);
     ((SelectStatement) stmt).setWhere(whereClause);
     Tree tree = stmt.getPlan(_metadataManager, "demo");
-    validateDeepPath("testWhereWithPartialPartitionKey");
+    validateDeepPath("testWhereWithInClause");
   }
 
   @Test
@@ -191,6 +195,46 @@ public class SelectStatementTest extends BasicPlannerTest {
     List<Relation> whereClause = Arrays.asList(relation1, relation2);
     ((SelectStatement) stmt).setWhere(whereClause);
     Tree tree = stmt.getPlan(_metadataManager, "demo");
-    validateDeepPath("testWhereWithPartialPartitionKey");
+    validateDeepPath("testWhereWithBetweenClause");
   }
+
+  @Test
+  public void testGroupByWithCount() {
+
+    String inputText = "SELECT gender, COUNT(*) FROM demo.users GROUP BY gender;";
+
+    List<SelectionSelector> selectionSelectors =
+        Arrays.asList(new SelectionSelector(new SelectorIdentifier("gender")),
+            new SelectionSelector(new SelectorGroupBy(GroupByFunction.COUNT,
+                new SelectorIdentifier("*"))));
+
+    SelectionClause selClause = new SelectionList(new SelectionSelectors(selectionSelectors));
+    stmt = new SelectStatement(selClause, "demo.users");
+    GroupBy groupClause = new GroupBy(Arrays.asList("gender"));
+    ((SelectStatement) stmt).setGroup(groupClause);
+    stmt.getPlan(_metadataManager, "demo");
+    validateDeepPath("testGroupByWithCount");
+  }
+
+  @Test
+  public void testSimpleOrderByOk() {
+
+    String inputText = "SELECT age FROM demo.users ORDER BY age;";
+
+    List<SelectionSelector> selectionSelectors =
+        Arrays.asList(new SelectionSelector(new SelectorIdentifier("age")));
+
+    SelectionClause selClause = new SelectionList(new SelectionSelectors(selectionSelectors));
+    stmt = new SelectStatement(selClause, "demo.users");
+
+    // Order by clause
+    List<Ordering> orderFieldsList = new ArrayList<>();
+    Ordering order = new Ordering("users.age");
+    orderFieldsList.add(order);
+
+    ((SelectStatement) stmt).setOrder(orderFieldsList);
+    stmt.getPlan(_metadataManager, "demo");
+    validateDeepPath("testSimpleOrderByOk");
+  }
+
 }

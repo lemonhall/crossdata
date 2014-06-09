@@ -151,4 +151,74 @@ public class SelectStatementTest extends ParsingTest {
         "SELECT users.name FROM demo.users WHERE users.email BETWEEN 'aaaa_00@domain.com';";
     testRecoverableError(inputText, "selectWithInClauseOneValueOk");
   }
+
+  @Test
+  public void selectGroupedWithCountOk() {
+
+    String inputText = "SELECT users.gender, COUNT(*) FROM demo.users GROUP BY gender;";
+    testRegularStatement(inputText, "selectGroupedWithCountOk");
+  }
+
+  @Test
+  public void selectGroupedWithSumOk() {
+
+    String inputText = "SELECT users.gender, SUM(age) FROM demo.users GROUP BY gender;";
+    testRegularStatement(inputText, "selectGroupedWithSumOk");
+  }
+
+  @Test
+  public void selectSimpleOrderByOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY users.age;";
+    testRegularStatement(inputText, "selectSimpleOrderByOk");
+  }
+
+  @Test
+  public void selectMultipleOrderByOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY users.age, users.gender;";
+    testRegularStatement(inputText, "selectSimpleOrderByOk");
+  }
+
+  @Test
+  public void selectSimpleOrderByWithoutTableOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY age;";
+    testRegularStatement(inputText, "selectSimpleOrderByOk");
+  }
+
+  @Test
+  public void selectMultipleOrderByWithoutTableOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY age, gender;";
+    testRegularStatement(inputText, "selectSimpleOrderByOk");
+  }
+
+  @Test
+  public void selectMultipleOrderByWithoutTableMultipleDirectionOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY age ASC, gender DESC;";
+    testRegularStatement(inputText, "selectSimpleOrderByOk");
+  }
+
+  @Test
+  public void selectSimpleOrderByWithAscDirectionOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY users.age ASC;";
+    testRegularStatement(inputText, "selectSimpleOrderByWithAscDirectionOk");
+  }
+
+  @Test
+  public void selectSimpleOrderByWithDescDirectionOk() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY users.age DESC;";
+    testRegularStatement(inputText, "selectSimpleOrderByWithDescDirectionOk");
+  }
+
+  @Test
+  public void selectSimpleOrderByFail() {
+
+    String inputText = "SELECT users.gender FROM demo.users ORDER BY sum(age);";
+    testRecoverableError(inputText, "selectGroupedWithSumOk");
+  }
 }
