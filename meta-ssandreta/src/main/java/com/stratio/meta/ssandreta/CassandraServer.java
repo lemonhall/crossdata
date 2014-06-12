@@ -1,4 +1,4 @@
-package com.stratio.ssandreta;
+package com.stratio.meta.ssandreta;
 
 import java.io.File;
 import java.io.FileOutputStream;

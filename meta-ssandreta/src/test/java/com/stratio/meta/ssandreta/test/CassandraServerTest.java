@@ -1,4 +1,4 @@
-package com.stratio.ssandreta.test;
+package com.stratio.meta.ssandreta.test;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
-import com.stratio.ssandreta.CassandraServer;
+import com.stratio.meta.ssandreta.CassandraServer;
 
 public class CassandraServerTest {
 

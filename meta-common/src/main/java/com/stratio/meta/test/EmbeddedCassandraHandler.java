@@ -56,9 +56,8 @@ public class EmbeddedCassandraHandler {
             tempFile.setExecutable(true);
             String path = tempFile.getAbsolutePath();
             Process p = Runtime.getRuntime().exec(path);
-//            Thread.sleep(5000); // allows cassandra enought time to start 
             in = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.forName("UTF-8")));
-
+            Thread.sleep(10000); //allows cassandra server enough time to start
             String line;
             while ((line = in.readLine()) != null) {
                 LOG.debug(line);
@@ -66,8 +65,8 @@ public class EmbeddedCassandraHandler {
             FileUtils.forceDeleteOnExit(tempFile);
         } catch (IOException e) {
             LOG.error("Error starting embedded Cassandra", e);
-//        } catch (InterruptedException e) {
-//			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		} finally {
             if(in != null) {
                 try {

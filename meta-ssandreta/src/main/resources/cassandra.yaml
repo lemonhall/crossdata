@@ -94,10 +94,10 @@ partitioner: org.apache.cassandra.dht.Murmur3Partitioner
 # will spread data evenly across them, subject to the granularity of
 # the configured compaction strategy.
 data_file_directories:
-    - /var/lib/cassandra/data
+    - REPLACEDIR/data
 
 # commit log
-commitlog_directory: /var/lib/cassandra/commitlog
+commitlog_directory: REPLACEDIR/commitlog
 
 # policy for data disk failures:
 # stop_paranoid: shut down gossip and Thrift even for single-sstable errors.
@@ -181,7 +181,7 @@ row_cache_save_period: 0
 # memory_allocator: NativeAllocator
 
 # saved caches
-saved_caches_directory: /var/lib/cassandra/saved_caches
+saved_caches_directory: REPLACEDIR/saved_caches
 
 # commitlog_sync may be either "periodic" or "batch." 
 # When in batch mode, Cassandra won't ack writes until the commit log
@@ -684,4 +684,3 @@ inter_dc_tcp_nodelay: false
 # for sequential access. Note: This could be harmful for fat rows, see CASSANDRA-4937
 # for further details on that topic.
 preheat_kernel_page_cache: false
-

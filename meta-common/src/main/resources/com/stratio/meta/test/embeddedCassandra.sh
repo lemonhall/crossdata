@@ -26,6 +26,6 @@ CURRENT_DIR=$(pwd)
 COMPLETE_DIR="`locate meta-ssandreta/pom.xml`"
 DIR_NAME="`dirname $COMPLETE_DIR`"
 cd $DIR_NAME
-nohup mvn exec:java -Dexec.mainClass="com.stratio.ssandreta.Main" &
+nohup mvn exec:java -Dexec.mainClass="com.stratio.meta.ssandreta.Main" &
 cd ${CURRENT_DIR}
 fi
