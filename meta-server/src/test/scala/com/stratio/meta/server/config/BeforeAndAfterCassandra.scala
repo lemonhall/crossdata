@@ -28,7 +28,7 @@ import java.net.URL
 import java.util
 import java.io.IOException
 import scala.collection.mutable.MutableList
-import com.stratio.meta.test.EmbeddedCassandraHandler
+import com.stratio.meta.ssandreta.EmbeddedCassandraHandler
 
 trait BeforeAndAfterCassandra extends BeforeAndAfterAll {
   this:Suite =>

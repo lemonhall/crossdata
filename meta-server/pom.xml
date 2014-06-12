@@ -178,6 +178,11 @@
             <artifactId>meta-common</artifactId>
             <version>${meta.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.stratio.meta</groupId>
+            <artifactId>meta-ssandreta</artifactId>
+            <version>${meta.version}</version>
+        </dependency>
 
     </dependencies>
 

@@ -19,16 +19,7 @@
 
 package com.stratio.meta.core.cassandra;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.KeyspaceMetadata;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.exceptions.InvalidQueryException;
-import com.stratio.meta.core.parser.Parser;
-import com.stratio.meta.test.EmbeddedCassandraHandler;
-import org.apache.log4j.Logger;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import static org.testng.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,8 +28,17 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.assertTrue;
+import org.apache.log4j.Logger;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.KeyspaceMetadata;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Session;
+import com.datastax.driver.core.exceptions.InvalidQueryException;
+import com.stratio.meta.core.parser.Parser;
+import com.stratio.meta.ssandreta.EmbeddedCassandraHandler;
 
 public class BasicCoreCassandraTest {
 

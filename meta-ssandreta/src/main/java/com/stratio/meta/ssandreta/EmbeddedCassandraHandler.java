@@ -17,7 +17,7 @@
  * License along with this library.
  */
 
-package com.stratio.meta.test;
+package com.stratio.meta.ssandreta;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,20 +44,20 @@ public class EmbeddedCassandraHandler {
 
     /**
      * Start a test Cassandra embedded server to execute the unit tests. The method creates a
-     * temporal file with the contents of {@code /com/stratio/meta/test/cassandraEmbedded.sh} and proceeds
+     * temporal file with the contents of {@code /com/stratio/meta/test/embeddedCassandra.sh} and proceeds
      * with its execution.
      */
     public static void startEmbeddedCassandra(){
         BufferedReader in = null;
         try {
             File tempFile = File.createTempFile("stratio-embedded-cassandra-start",".sh");
-            InputStream resourceStream = EmbeddedCassandraHandler.class.getResourceAsStream("/com/stratio/meta/test/embeddedCassandra.sh");
+            InputStream resourceStream = EmbeddedCassandraHandler.class.getResourceAsStream("/embeddedCassandra.sh");
             FileUtils.copyInputStreamToFile(resourceStream,tempFile);
             tempFile.setExecutable(true);
             String path = tempFile.getAbsolutePath();
             Process p = Runtime.getRuntime().exec(path);
             in = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.forName("UTF-8")));
-            Thread.sleep(10000); //allows cassandra server enough time to start
+            Thread.sleep(7000); //allows cassandra server enough time to start
             String line;
             while ((line = in.readLine()) != null) {
                 LOG.debug(line);
