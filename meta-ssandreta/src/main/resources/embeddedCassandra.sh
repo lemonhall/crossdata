@@ -20,12 +20,13 @@
 # Stratio Meta CCM Test
 # 
 # PRE: Git, pyYaml module for python, Ant
-pgrep -f ssandr
+pgrep -f casselfie
 if [ $? -eq 0 ]; then
 CURRENT_DIR=$(pwd)
-COMPLETE_DIR="`locate meta-ssandreta/pom.xml`"
+MAVEN_HOME=mvn help:evaluate -Dexpression=settings.localRepository | grep -v '[INFO]'
+COMPLETE_DIR="$MAVEN_HOME/casselfie/stratio-casselfie.jar"
 DIR_NAME="`dirname $COMPLETE_DIR`"
 cd $DIR_NAME
-nohup mvn exec:java -Dexec.mainClass="com.stratio.meta.ssandreta.Main" &
+java -cp com.stratio.casselfie.Main.java stratio-casselfie.jar &
 cd ${CURRENT_DIR}
 fi
