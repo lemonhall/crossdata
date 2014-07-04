@@ -1765,14 +1765,6 @@ public class SelectStatement extends MetaStatement {
   private boolean checkWhereColsWithLucene(Set<String> luceneCols, Map<String, String> whereCols,
       MetadataManager metadataManager, boolean cassandraPath) {
 
-    for(String l : luceneCols){
-      System.out.println("luceneCols: " + l);
-    }
-
-    for(Map.Entry<String, String> col : whereCols.entrySet()){
-      System.out.println("k: " + col.getKey() + ", v: " + col.getValue());
-    }
-
     if (luceneCols.containsAll(whereCols.keySet())) {
       boolean onlyMatchOperators = true;
       for (String operator : whereCols.values()) {
@@ -1796,7 +1788,6 @@ public class SelectStatement extends MetaStatement {
        * stringTerm.isQuotedLiteral()); } }
        */
     }
-    System.out.println("łłłłłłłłłłłłłłłłłłłłłłłłłłłłłłłłł " + cassandraPath);
     return cassandraPath;
   }
 
@@ -1833,11 +1824,9 @@ public class SelectStatement extends MetaStatement {
         Set<String> indexedCols = new HashSet<>();
         Set<String> luceneCols = new HashSet<>();
         for (CustomIndexMetadata cim : metadataManager.getTableIndex(tableMetadata)) {
-          System.out.println("ĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸĸ " + cim.getIndexName() + " type: " + cim.getIndexType());
           if (cim.getIndexType() == IndexType.DEFAULT) {
             indexedCols.addAll(cim.getIndexedColumns());
           } else if (cim.getIndexType() == IndexType.LUCENE){
-            System.out.println("¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢¢ " + cim.getIndexedColumns());
             luceneCols.addAll(cim.getIndexedColumns());
           }
         }
@@ -1853,7 +1842,6 @@ public class SelectStatement extends MetaStatement {
         }
       }
     }
-    System.out.println("####################### cassandraPath: " + cassandraPath);
     if (cassandraPath) {
       steps.setNode(new MetaStep(MetaPath.CASSANDRA, this));
     } else {

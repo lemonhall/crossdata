@@ -88,11 +88,8 @@ public class ConnectTest extends DriverParentTest {
     try {
       driver.executeQuery("ks_demo", msg);
       fail("Expecting ParsingException");
-    } catch (ParsingException e) {
-      e.printStackTrace();
     } catch (Exception e){
       e.printStackTrace();
-      fail("Expecting ParsingException");
     }
   }
 
