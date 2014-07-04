@@ -286,6 +286,7 @@ public class MetadataManager {
                        .compareTo("org.apache.cassandra.db.index.stratio.RowIndex") == 0) {
           // A Lucene custom index is found that may index several columns.
           toAdd = luceneHelper.getLuceneIndex(column, column.getIndex().getName());
+          System.out.println(">>>>>>>>>>>>>>>>> " + toAdd.getIndexedColumns());
         } else {
           LOG.error("Index " + column.getIndex().getName() + " on " + column.getName()
                     + " with class " + column.getIndex().getIndexClassName() + " not supported.");
