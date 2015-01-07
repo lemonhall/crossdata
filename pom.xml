@@ -110,7 +110,6 @@
 
     <build>
         <plugins>
-		<!--
 	     <plugin>
                 <groupId>com.stratio.mojo.unix</groupId>
                 <artifactId>unix-maven-plugin</artifactId>
@@ -188,7 +187,6 @@
                     </assembly>
                 </configuration>
             </plugin>
-		-->
 
 
             <plugin>
