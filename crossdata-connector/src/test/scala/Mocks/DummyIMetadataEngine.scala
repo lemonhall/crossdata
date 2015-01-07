@@ -31,7 +31,7 @@ class DummyIMetadataEngine extends IMetadataEngine{
   override def createCatalog(targetCluster: ClusterName, catalogMetadata: CatalogMetadata): Unit = {}
 
   override def createTable(targetCluster: ClusterName, tableMetadata: TableMetadata): Unit = {
-      logger.debug("very slow function")
+      logger.debug("very slow includes")
       for (i <- 1 to 5) {
         val a:Int=1000
 
@@ -57,4 +57,17 @@ class DummyIMetadataEngine extends IMetadataEngine{
                             options: java.util.Map[Selector, Selector]): Unit = {}
 
   override def alterTable(targetCluster: ClusterName, name: TableName, alterOptions: AlterOptions): Unit = {}
+
+  override def provideMetadata(clusterName: ClusterName): java.util.List[CatalogMetadata] = {
+    return null
+  }
+
+  override def provideCatalogMetadata(clusterName: ClusterName, catalogName: CatalogName): CatalogMetadata = {
+    return null
+  }
+
+  override def provideTableMetadata(clusterName: ClusterName, tableName: TableName): TableMetadata = {
+    return null
+  }
+
 }

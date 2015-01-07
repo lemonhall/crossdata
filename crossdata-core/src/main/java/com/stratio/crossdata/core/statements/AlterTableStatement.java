@@ -21,15 +21,15 @@ package com.stratio.crossdata.core.statements;
 import java.util.Map;
 
 import com.stratio.crossdata.common.data.AlterOperation;
-import com.stratio.crossdata.common.metadata.ColumnMetadata;
-import com.stratio.crossdata.common.utils.StringUtils;
 import com.stratio.crossdata.common.data.CatalogName;
 import com.stratio.crossdata.common.data.ColumnName;
 import com.stratio.crossdata.common.data.TableName;
+import com.stratio.crossdata.common.metadata.ColumnMetadata;
 import com.stratio.crossdata.common.metadata.ColumnType;
 import com.stratio.crossdata.common.statements.structures.Selector;
-import com.stratio.crossdata.core.validator.requirements.ValidationTypes;
+import com.stratio.crossdata.common.utils.StringUtils;
 import com.stratio.crossdata.core.validator.requirements.ValidationRequirements;
+import com.stratio.crossdata.core.validator.requirements.ValidationTypes;
 
 /**
  * Class that models an {@code ALTER TABLE} statement from the CROSSDATA language.
@@ -83,8 +83,8 @@ public class AlterTableStatement extends MetadataStatement implements ITableStat
         this.type = type;
         this.properties = StringUtils.convertJsonToOptions(properties);
         this.option = option;
-        Object[] parameters={};
-        this.columnMetadata=new ColumnMetadata(column,parameters,type);
+        Object[] parameters = { };
+        this.columnMetadata = new ColumnMetadata(column, parameters, type);
     }
 
     @Override
@@ -112,7 +112,9 @@ public class AlterTableStatement extends MetadataStatement implements ITableStat
             sb.append("BAD OPTION");
             break;
         }
-
+        if((option != AlterOperation.ALTER_OPTIONS) && (properties != null) && (!properties.isEmpty())){
+            sb.append(" WITH ").append(properties);
+        }
         return sb.toString();
     }
 
@@ -137,7 +139,7 @@ public class AlterTableStatement extends MetadataStatement implements ITableStat
                     .add(ValidationTypes.MUST_EXIST_PROPERTIES);
             break;
         default:
-            validationRequirements = new ValidationRequirements();
+            validationRequirements = new ValidationRequirements().add(ValidationTypes.MUST_EXIST_TABLE);
         }
         return validationRequirements;
     }

@@ -20,6 +20,7 @@ package com.stratio.crossdata.core.coordinator;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,7 @@ import com.stratio.crossdata.common.metadata.DataStoreMetadata;
 import com.stratio.crossdata.common.metadata.IndexMetadata;
 import com.stratio.crossdata.common.metadata.TableMetadata;
 import com.stratio.crossdata.common.result.CommandResult;
+import com.stratio.crossdata.common.result.MetadataResult;
 import com.stratio.crossdata.common.result.Result;
 import com.stratio.crossdata.common.statements.structures.Selector;
 import com.stratio.crossdata.communication.AlterCluster;
@@ -67,8 +69,7 @@ public class Coordinator implements Serializable {
      *
      * @param metadataWorkflow The metadata workflow.
      */
-    public void persist(MetadataWorkflow metadataWorkflow) {
-
+    public void persist(MetadataWorkflow metadataWorkflow, MetadataResult result) {
         switch (metadataWorkflow.getExecutionType()) {
         case CREATE_CATALOG:
             persistCreateCatalog(metadataWorkflow.getCatalogMetadata(), metadataWorkflow.isIfNotExists());
@@ -94,6 +95,15 @@ public class Coordinator implements Serializable {
             break;
         case DROP_TABLE:
             persistDropTable(metadataWorkflow.getTableName());
+            break;
+        case IMPORT_CATALOGS:
+            persistImportCatalogs(result.getCatalogMetadataList());
+            break;
+        case IMPORT_CATALOG:
+            persistImportCatalogs(result.getCatalogMetadataList());
+            break;
+        case IMPORT_TABLE:
+            persistTables(result.getTableList(), metadataWorkflow.getClusterName());
             break;
         default:
             LOG.info("unknown statement detected");
@@ -168,8 +178,8 @@ public class Coordinator implements Serializable {
     /**
      * Persists new options' cluster in Metadata manager.
      *
-     * @param clusterName   The cluster name.
-     * @param options       A set of cluster options.
+     * @param clusterName The cluster name.
+     * @param options     A set of cluster options.
      * @return A {@link com.stratio.crossdata.common.result.Result}.
      */
     public Result persistAlterCluster(ClusterName clusterName,
@@ -186,7 +196,7 @@ public class Coordinator implements Serializable {
     /**
      * Detaches cluster from Metadata Manager.
      *
-     * @param clusterName   The cluster name.
+     * @param clusterName The cluster name.
      * @return A {@link com.stratio.crossdata.common.result.Result}.
      */
     public Result persistDetachCluster(ClusterName clusterName) {
@@ -202,21 +212,24 @@ public class Coordinator implements Serializable {
         datastoreMetadata.setClusterAttachedRefs(clusterAttachedRefs);
 
         MetadataManager.MANAGER.createDataStore(datastoreMetadata, false);
+
+        MetadataManager.MANAGER.deleteCluster(clusterName, false);
+
         return CommandResult.createCommandResult("CLUSTER detached successfully");
     }
 
     /**
      * Persists catalog data in Metadata Manager.
      *
-     * @param catalog The catalog metadata to be stored.
+     * @param catalog     The catalog metadata to be stored.
      * @param ifNotExists If Catalog doesn't exist.
      */
     public void persistCreateCatalog(CatalogMetadata catalog, boolean ifNotExists) {
         boolean persistOperation = true;
-        if(ifNotExists && (MetadataManager.MANAGER.exists(catalog.getName()))){
+        if (ifNotExists && (MetadataManager.MANAGER.exists(catalog.getName()))) {
             persistOperation = false;
         }
-        if(persistOperation){
+        if (persistOperation) {
             MetadataManager.MANAGER.createCatalog(catalog);
         }
     }
@@ -338,4 +351,26 @@ public class Coordinator implements Serializable {
 
         return CommandResult.createCommandResult("CONNECTOR detached successfully");
     }
+
+    private void persistImportCatalogs(List<CatalogMetadata> catalogMetadataList) {
+        for(CatalogMetadata catalog: catalogMetadataList){
+            MetadataManager.MANAGER.createCatalog(catalog);
+        }
+    }
+
+    private void persistTables(List<TableMetadata> tableMetadataList, ClusterName clusterName) {
+        for(TableMetadata table: tableMetadataList){
+            CatalogName catalogName = table.getName().getCatalogName();
+            if(!MetadataManager.MANAGER.exists(catalogName)){
+                CatalogMetadata catalogMetadata = new CatalogMetadata(
+                        catalogName,
+                        new HashMap<Selector, Selector>(),
+                        new HashMap<TableName, TableMetadata>());
+                MetadataManager.MANAGER.createCatalog(catalogMetadata);
+            }
+            table.setClusterRef(clusterName);
+            MetadataManager.MANAGER.createTable(table);
+        }
+    }
+
 }

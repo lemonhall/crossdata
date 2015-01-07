@@ -19,6 +19,8 @@
 package com.stratio.crossdata.common.utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -26,17 +28,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
 
+import com.stratio.crossdata.common.metadata.ColumnType;
 import com.stratio.crossdata.common.statements.structures.BooleanSelector;
 import com.stratio.crossdata.common.statements.structures.FloatingPointSelector;
 import com.stratio.crossdata.common.statements.structures.IntegerSelector;
 import com.stratio.crossdata.common.statements.structures.Selector;
 import com.stratio.crossdata.common.statements.structures.StringSelector;
+
+import difflib.DiffUtils;
+import difflib.Patch;
+import difflib.PatchFailedException;
 
 /**
  * Utility class for String transformation operations.
@@ -154,4 +161,65 @@ public final class StringUtils {
         return null;
     }
 
+    public static ColumnType convertJavaTypeToXdType(String javaType) {
+        ColumnType ct = ColumnType.NATIVE;
+        if(javaType.equalsIgnoreCase("Long")){
+            ct = ColumnType.BIGINT;
+        } else if(javaType.equalsIgnoreCase("Boolean")){
+            ct = ColumnType.BOOLEAN;
+        } else if(javaType.equalsIgnoreCase("Double")){
+            ct = ColumnType.DOUBLE;
+        } else if(javaType.equalsIgnoreCase("Float")){
+            ct = ColumnType.DOUBLE;
+        } else if(javaType.equalsIgnoreCase("Integer")){
+            ct = ColumnType.INT;
+        } else if(javaType.equalsIgnoreCase("String")){
+            ct = ColumnType.TEXT;
+        } else if(javaType.equalsIgnoreCase("Set")){
+            ct = ColumnType.SET;
+        } else if(javaType.equalsIgnoreCase("List")){
+            ct = ColumnType.LIST;
+        } else if(javaType.equalsIgnoreCase("MAP")){
+            ct = ColumnType.MAP;
+        }
+        return ct;
+    }
+
+    public static difflib.Patch objectDiff(Object oa, Object ob){
+        String[] a = serializeObject2String(oa).split("\n");
+        String[] b = serializeObject2String(ob).split("\n");
+        ArrayList<String> lista = new ArrayList<String>(Arrays.asList(a));
+        ArrayList<String> listb = new ArrayList<String>(Arrays.asList(b));
+        return DiffUtils.diff(lista, listb);
+    }
+    
+    public static String patchObject(ArrayList<String> a, Patch diff) throws PatchFailedException {
+        String[] lista = StringUtils.serializeObject2String(a).split("\n"); //apply patch to a
+        List<String> partialresult = (List<String>) diff.applyTo(Arrays.asList(lista));
+        String jsonresult="";
+        for(String res:partialresult){ jsonresult+=res; }
+        return jsonresult;
+    }
+    
+    public static Object deserializeObjectFromString(String serializedObject, Class objectsClass) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.readValue(mapper.readTree(serializedObject), ArrayList.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static String serializeObject2String(Object obj) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable( SerializationConfig.Feature.INDENT_OUTPUT );
+        mapper.enable( SerializationConfig.Feature.SORT_PROPERTIES_ALPHABETICALLY);
+        String serialized = null;
+        try {
+            serialized = mapper.writeValueAsString(obj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return serialized;
+    }
 }

@@ -18,6 +18,7 @@
 
 package com.stratio.crossdata.common.metadata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -34,7 +35,7 @@ import com.stratio.crossdata.common.statements.structures.Selector;
 /**
  * TableMetadata class.
  */
-public class TableMetadata implements IMetadata {
+public class TableMetadata implements Serializable {
 
     private static final long serialVersionUID = 937637791215246279L;
 
@@ -46,7 +47,7 @@ public class TableMetadata implements IMetadata {
 
     private Map<IndexName, IndexMetadata> indexes;
 
-    private final ClusterName clusterRef;
+    private ClusterName clusterRef;
 
     private final List<ColumnName> partitionKey;
     private final List<ColumnName> clusterKey;
@@ -121,6 +122,10 @@ public class TableMetadata implements IMetadata {
      */
     public ClusterName getClusterRef() {
         return clusterRef;
+    }
+
+    public void setClusterRef(ClusterName clusterRef) {
+        this.clusterRef = clusterRef;
     }
 
     /**

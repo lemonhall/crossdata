@@ -149,6 +149,17 @@ class BasicDriver(basicDriverConfig: BasicDriverConfig) {
    * @param callback The callback object.
    */
   @throws(classOf[ConnectionException])
+  def asyncExecuteQuery(query: com.stratio.crossdata.driver.querybuilder.Query,
+                        callback: IDriverResultHandler): Result = {
+    asyncExecuteQuery(query.toString, callback)
+  }
+
+  /**
+   * Execute a query in the Crossdata server asynchronously.
+   * @param query The query.
+   * @param callback The callback object.
+   */
+  @throws(classOf[ConnectionException])
   def asyncExecuteQuery(query: String, callback: IDriverResultHandler): Result = {
     if (userId.isEmpty) {
       throw new ConnectionException("You must connect to cluster")
@@ -177,6 +188,20 @@ class BasicDriver(basicDriverConfig: BasicDriverConfig) {
   @throws(classOf[ValidationException])
   @throws(classOf[ExecutionException])
   @throws(classOf[UnsupportedException])
+  def executeQuery(query: com.stratio.crossdata.driver.querybuilder.Query): Result = {
+    executeQuery(query.toString)
+  }
+
+  /**
+   * Launch query in Crossdata Server
+   * @param query Launched query
+   * @return QueryResult
+   */
+  @throws(classOf[ConnectionException])
+  @throws(classOf[ParsingException])
+  @throws(classOf[ValidationException])
+  @throws(classOf[ExecutionException])
+  @throws(classOf[UnsupportedException])
   def executeQuery(query: String): Result = {
     if (userId.isEmpty) {
       throw new ConnectionException("You must connect to cluster")
@@ -191,10 +216,10 @@ class BasicDriver(basicDriverConfig: BasicDriverConfig) {
   }
 
   def executeRawQuery(command: String): Result = {
-    executeRawQuery(command, null)
+    executeAsyncRawQuery(command, null)
   }
 
-  def executeRawQuery(command: String, callback: IDriverResultHandler): Result = {
+  def executeAsyncRawQuery(command: String, callback: IDriverResultHandler): Result = {
     var result:Result = null.asInstanceOf[Result]
     if(command.toLowerCase.startsWith("use ")){
       result = updateCatalog(command)
@@ -253,6 +278,34 @@ class BasicDriver(basicDriverConfig: BasicDriverConfig) {
       result = explainPlan(command)
     }
     return result
+  }
+
+  def discoverMetadata(clusterName: String): Result = {
+    if (userId.isEmpty) {
+      throw new ConnectionException("You must connect to cluster")
+    }
+    executeQuery("DISCOVER METADATA ON CLUSTER " + clusterName + ";");
+  }
+
+  def importCatalogs(clusterName: String): Result = {
+    if (userId.isEmpty) {
+      throw new ConnectionException("You must connect to cluster")
+    }
+    executeQuery("IMPORT CATALOGS FROM CLUSTER " + clusterName + ";")
+  }
+
+  def importCatalog(clusterName: String, catalogName: String): Result = {
+    if (userId.isEmpty) {
+      throw new ConnectionException("You must connect to cluster")
+    }
+    executeQuery("IMPORT CATALOG " + catalogName + " FROM CLUSTER " + clusterName + ";")
+  }
+
+  def importTable(clusterName: String, tableName: String): Result = {
+    if (userId.isEmpty) {
+      throw new ConnectionException("You must connect to cluster")
+    }
+    executeQuery("IMPORT TABLE " + tableName + " FROM CLUSTER " + clusterName + ";")
   }
 
   /**
@@ -317,7 +370,8 @@ class BasicDriver(basicDriverConfig: BasicDriverConfig) {
       } else if (command.toLowerCase.startsWith("describe table ") &&
         command.toLowerCase.replace("describe table ", "").replace(";", "").trim.contains(".")) {
         val table = command.toLowerCase.replace("describe table ", "").replace(";", "").trim
-        result = describeTable(new TableName(getCurrentCatalog, table))
+        val tokens: Array[String] = table.split("\\.")
+        result = describeTable(new TableName(tokens(0), tokens(1)))
       } else if (!getCurrentCatalog.isEmpty) {
         val table = getCurrentCatalog + "." +
           command.toLowerCase.replace("describe table ", "").replace(";", "").trim
