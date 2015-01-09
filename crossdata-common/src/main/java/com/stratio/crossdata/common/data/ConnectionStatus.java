@@ -16,23 +16,9 @@
  * under the License.
  */
 
-package com.stratio.crossdata.communication
+package com.stratio.crossdata.common.data;
 
-import com.stratio.crossdata.common.metadata.IMetadata
-
-//CONNECTOR messages
-case class Start()
-
-case class Shutdown()
-
-case class HeartbeatSig()
-
-case class IAmAlive(queryId:String)
-
-case class Stop()
-
-case class UpdateMetadata(metadata:IMetadata)
-
-//case class PatchMetadata(diffs:Patch,metadataClass:java.lang.Class[_])
-
-
+public enum ConnectionStatus {
+    CONNECTED,
+    DISCONNECTED
+}

@@ -20,9 +20,11 @@ package com.stratio.crossdata.connectors
 
 import akka.actor.{ActorSelection, ActorRef, ActorSystem}
 import akka.routing.RoundRobinRouter
+import com.stratio.crossdata.common.data.{ConnectionStatus, TableName, CatalogName}
+import com.stratio.crossdata.common.metadata.{CatalogMetadata, TableMetadata}
 import com.stratio.crossdata.common.utils.StringUtils
 import com.stratio.crossdata.connectors.config.ConnectConfig
-import com.stratio.crossdata.common.connector.{IConfiguration, IConnector}
+import com.stratio.crossdata.common.connector.{IConnectorApp, IConfiguration, IConnector}
 import com.stratio.crossdata.communication.Shutdown
 import org.apache.log4j.Logger
 
@@ -30,7 +32,7 @@ object ConnectorApp extends App {
   args.length==2
 }
 
-class ConnectorApp extends ConnectConfig {
+class ConnectorApp extends ConnectConfig with IConnectorApp {
 
   type OptionMap = Map[Symbol, String]
   lazy val system = ActorSystem(clusterName, config)
@@ -50,7 +52,19 @@ class ConnectorApp extends ConnectConfig {
     actorClusterNode = Some(system.actorOf(ConnectorActor.props(connector.getConnectorName,
       connector).withRouter(RoundRobinRouter(nrOfInstances = num_connector_actor)), "ConnectorActor"))
     connector.init(new IConfiguration {})
-    system.actorSelection( StringUtils.getAkkaActorRefUri(actorClusterNode.get.toString()))
+    system.actorSelection(StringUtils.getAkkaActorRefUri(actorClusterNode.get.toString()))
+  }
+
+  override def getTableMetadata(tablename: TableName): TableMetadata = {
+    actorClusterNode.asInstanceOf[IConnectorApp].getTableMetadata(tablename)
+  }
+
+  override def getCatalogMetadata(catalogname: CatalogName): CatalogMetadata= {
+    actorClusterNode.asInstanceOf[IConnectorApp].getCatalogMetadata(catalogname)
+  }
+
+  override def getConnectionStatus(): ConnectionStatus = {
+    actorClusterNode.asInstanceOf[IConnectorApp].getConnectionStatus
   }
 
 }

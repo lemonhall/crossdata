@@ -16,11 +16,16 @@
  * under the License.
  */
 
-package com.stratio.crossdata.common.utils;
+package com.stratio.crossdata.common.connector;
 
-/**
- * Created by carlos on 15/10/14.
- */
-public interface Command {
-    void invoke();
+import com.stratio.crossdata.common.data.CatalogName;
+import com.stratio.crossdata.common.data.ConnectionStatus;
+import com.stratio.crossdata.common.data.TableName;
+import com.stratio.crossdata.common.metadata.CatalogMetadata;
+import com.stratio.crossdata.common.metadata.TableMetadata;
+
+public interface IConnectorApp {
+    TableMetadata getTableMetadata(TableName tablename);
+    CatalogMetadata getCatalogMetadata(CatalogName catalogname);
+    ConnectionStatus getConnectionStatus();
 }
