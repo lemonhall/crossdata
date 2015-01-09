@@ -89,6 +89,7 @@ ActorLogging with IResultHandler with IConnectorApp {
 
   override def receive: Receive = super.receive orElse {
 
+    /*
     case u: PatchMetadata=> {
       //TODO:
       u.metadataClass match{
@@ -98,6 +99,7 @@ ActorLogging with IResultHandler with IConnectorApp {
       //TODO:change
       sender ! true
     }
+    */
 
     case u: UpdateMetadata=> {
       u.metadata match{
