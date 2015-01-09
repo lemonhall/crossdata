@@ -89,15 +89,15 @@ ActorLogging with IResultHandler with IConnectorApp {
 
   override def receive: Receive = super.receive orElse {
 
-    /*
-    //TODO:
     case u: PatchMetadata=> {
+      //TODO:
       u.metadataClass match{
         case CatalogMetadata => {
         }
       }
+      //TODO:change
+      sender ! true
     }
-    */
 
     case u: UpdateMetadata=> {
       u.metadata match{
