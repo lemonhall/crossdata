@@ -34,27 +34,32 @@
           <h1>
 <a id="about" class="anchor" href="#about" aria-hidden="true"><span class="octicon octicon-link"></span></a>About</h1>
 
-<p>Crossdata (aka Meta) is a distributed framework that unifies the interaction with batch and streaming sources supporting multiple datastore technologies thanks to its generic architecture and a custom SQL-like language with support for streaming queries. Supporting multiple architectures imposes two main challenges: how to normalize the access to the datastores, and how to cope with datastore limitations. To access multiple technologies Crossdata defines a common unifying interface containing the set of operations that a datastore may support. New connectors can be easily added to increase its connectivity capabilities. Two types of connectors are defined: native and spark-based. Native connectors are faster for simple operations, while Spark-based connectors offer a larger set of functionality. The Crossdata planner decides which connector will be used for any request based its characteristics. We offer a shell, Java/REST APIs, and ODBC for BI.</p>
-
-<h2>
-<a id="full-documentation" class="anchor" href="#full-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Full documentation</h2>
-
-<p>See the Wiki for full documentation, examples, operational details and other information.</p>
-
-<p>See the <a href="">Javadoc</a> and <a href="_doc/Grammar.md">Language reference</a> for the internal details.</p>
+<p>Crossdata (aka Meta) is a distributed framework and a data layer that unifies the interaction with batch and streaming sources supporting multiple datastore technologies thanks to its generic architecture and a custom SQL-like language with support for streaming queries. Supporting multiple architectures imposes two main challenges: how to normalize the access to the datastores, and how to cope with datastore limitations. To access multiple technologies Crossdata defines a common unifying interface containing the set of operations that a datastore may support. New connectors can be easily added to increase its connectivity capabilities. Two types of connectors are defined: native and spark-based. Native connectors are faster for simple operations, while Spark-based connectors offer a larger set of functionality. The Crossdata planner decides which connector will be used for any request based its characteristics. We offer a shell, Java/REST APIs, and ODBC for BI.</p>
 
 <h2>
 <a id="compiling-crossdata" class="anchor" href="#compiling-crossdata" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling Crossdata</h2>
 
 <p>Compiling Crossdata involves generating a set of files (.tokens, Lexers, and Parsers) from the different grammar files. To automatically build Stratio Crossdata execute the following command:</p>
 
-<pre><code>   &gt; mvn clean compile install
+<pre><code>&gt; mvn clean compile install
 </code></pre>
 
 <h2>
 <a id="running-the-comstratiocrossdata-server" class="anchor" href="#running-the-comstratiocrossdata-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the com.stratio.crossdata-server</h2>
 
-<pre><code>   &gt; mvn exec:java -DskipTests -pl crossdata-server -Dexec.mainClass="com.stratio.crossdata.server.CrossdataApplication"
+<pre><code>&gt; mvn exec:java -DskipTests -pl crossdata-server -Dexec.mainClass="com.stratio.crossdata.server.CrossdataApplication"
+</code></pre>
+
+<p>or you can run our script located in crossdata-dist:</p>
+
+<pre><code>&gt; chmod +x crossdata-dist/target/crossdata-dist-[crossdata-version]/bin/crossdata-server
+&gt; cd crossdata-dist/target/crossdata-dist-[crossdata-version]/
+&gt; bin/crossdata-server
+</code></pre>
+
+<p>or run it like a service:</p>
+
+<pre><code>&gt; bin/crossdata-server-daemon start
 </code></pre>
 
 <h2>
@@ -68,30 +73,31 @@ The shell features:</p>
 <li>History support (arrow navigation)</li>
 <li>History search (ctrl-r)</li>
 <li>Token completion (tab)</li>
-<li>Help command</li>
-</ul>
+<li>
+<p>Help command</p>
 
-<pre><code>   &gt; mvn exec:java -pl crossdata-shell -Dexec.mainClass="com.stratio.crossdata.sh.Shell"
-</code></pre>
+<blockquote>
+<p>mvn exec:java -pl crossdata-shell -Dexec.mainClass="com.stratio.crossdata.sh.Shell"</p>
+</blockquote>
+</li>
+</ul>
 
 <p>The shell also supports synchronous query execution by means of the --sync parameter. This execution mode is required for streaming queries.</p>
 
-<pre><code>   &gt; mvn exec:java -pl crossdata-shell -Dexec.mainClass="com.stratio.crossdata.sh.Shell" -Dexec.args="--sync"
+<pre><code>&gt; mvn exec:java -pl crossdata-shell -Dexec.mainClass="com.stratio.crossdata.sh.Shell" -Dexec.args="--sync"
 </code></pre>
 
 <p>Additionally, you can execute an script upon launching the shell. The script will be executed first, and the prompt will be shown afterwards.</p>
 
-<pre><code>   &gt; mvn exec:java -pl crossdata-shell -Dexec.mainClass="com.stratio.crossdata.sh.Shell" -Dexec
-   .args="--script /path/script.xdql"
+<pre><code>&gt; mvn exec:java -pl crossdata-shell -Dexec.mainClass="com.stratio.crossdata.sh.Shell" -Dexec.args="--script /path/script.xdql"
 </code></pre>
 
-<h2>
-<a id="packaging" class="anchor" href="#packaging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Packaging</h2>
+<p>You can run our shell too, executing our crossdata-dist script:</p>
 
-<pre><code>   &gt; mvn package
+<pre><code>&gt; chmod +x crossdata-dist/target/crossdata-dist-[crossdata-version]/bin/crossdata-sh
+&gt; cd crossdata-dist/target/crossdata-dist-[crossdata-version]/
+&gt; bin/crossdata-sh
 </code></pre>
-
-<p>See <a href="https://github.com/Stratio/crossdata/edit/release/0.0.4/meta-dist/src/main/include/README.md">this link</a> to know start/stop the server and the shell from the dist packages</p>
 
 <h2>
 <a id="useful-commands" class="anchor" href="#useful-commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Useful commands</h2>
@@ -101,7 +107,7 @@ The shell features:</p>
 <h2>
 <a id="send-issues-to-jira" class="anchor" href="#send-issues-to-jira" aria-hidden="true"><span class="octicon octicon-link"></span></a>Send issues to Jira</h2>
 
-<p>You can send us issues in <a href="https://com.stratio.crossdata.atlassian.net">https://com.stratio.crossdata.atlassian.net</a></p>
+<p>You can send us issues in <a href="https://crossdata.atlassian.net/">https://crossdata.atlassian.net/</a></p>
 
 <h2>
 <a id="grammar" class="anchor" href="#grammar" aria-hidden="true"><span class="octicon octicon-link"></span></a>Grammar</h2>
@@ -152,17 +158,7 @@ under the License.</p>
           This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
         </footer>
 
-                  <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-55762512-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
-
+        
       </div>
     </div>
   </body>
