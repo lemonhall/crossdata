@@ -22,7 +22,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import com.stratio.crossdata.common.exceptions.PlanningException
 import com.stratio.crossdata.common.result.Result
 import com.stratio.crossdata.core.planner.Planner
-import com.stratio.crossdata.core.query.{MetadataValidatedQuery, SelectValidatedQuery, StorageValidatedQuery}
+import com.stratio.crossdata.core.query.{SqlValidatedQuery, MetadataValidatedQuery, SelectValidatedQuery, StorageValidatedQuery}
 import org.apache.log4j.Logger
 
 object PlannerActor {
@@ -74,6 +74,23 @@ class PlannerActor(coordinator: ActorRef, planner: Planner) extends Actor with T
 
     case query: StorageValidatedQuery => {
       log.info("\nGetting StorageValidatedQuery; sending ack to " + sender + "\n")
+      val timer = initTimer()
+      try {
+        val planned = planner.planQuery(query)
+        finishTimer(timer)
+        coordinator forward planned
+      } catch {
+        case pe:PlanningException => {
+          val errorResult = Result.createErrorResult(pe)
+          log.error("Planning error: " + pe.getMessage + " from  sender: " + sender.toString())
+          errorResult.setQueryId(query.getQueryId)
+          sender ! errorResult
+        }
+      }
+    }
+
+    case query: SqlValidatedQuery => {
+      log.info("\nGetting SqlValidatedQuery; sending ack to " + sender + "\n")
       val timer = initTimer()
       try {
         val planned = planner.planQuery(query)

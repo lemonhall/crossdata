@@ -94,4 +94,6 @@ public interface IStorageEngine {
      */
     void truncate(ClusterName targetCluster, TableName tableName) throws ConnectorException;
 
+    void insertSQL(ClusterName targetCluster, String sqlQuery) throws ConnectorException;
+
 }

@@ -64,5 +64,6 @@
         <operation>FILTER_NON_INDEXED_LET</operation>
         <operation>IMPORT_METADATA</operation>
         <operation>PAGINATION</operation>
+        <operation>SQL_DIRECT</operation>
     </SupportedOperations>
 </Connector>

@@ -18,6 +18,7 @@
 
 package com.stratio.crossdata.common.connector;
 
+import com.stratio.crossdata.common.data.ClusterName;
 import com.stratio.crossdata.common.exceptions.ConnectorException;
 import com.stratio.crossdata.common.logicalplan.LogicalWorkflow;
 import com.stratio.crossdata.common.result.QueryResult;
@@ -79,5 +80,7 @@ public interface IQueryEngine {
      *                            supported by the connector or ExecutionException if the execution fails.
      */
     void stop(String queryId) throws ConnectorException;
+
+    QueryResult selectSQL(ClusterName targetCluster, String sqlQuery) throws ConnectorException;
 
 }

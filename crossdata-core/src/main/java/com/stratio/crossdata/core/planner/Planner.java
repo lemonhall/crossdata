@@ -189,27 +189,28 @@ public class Planner {
             throws PlanningException {
         SqlWorkflow sqlWorkflow;
 
-        Map<ConnectorName, ConnectorMetadata> connectors = new HashMap<>();
-        List<ConnectorMetadata> partialCandidates = new ArrayList<>();
+        Set<ConnectorName> partialCandidates;
         Set<ConnectorName> candidates = new HashSet<>();
 
         List<TableName> tables = sqlValidatedQuery.getStatement().getTables();
 
+        ClusterMetadata clusterMetadata = null;
         for(TableName tableName: tables){
             TableMetadata tableMetadata = getTableMetadata(tableName);
-            ClusterMetadata clusterMetadata = getClusterMetadata(tableMetadata.getClusterRef());
+            clusterMetadata = getClusterMetadata(tableMetadata.getClusterRef());
             partialCandidates = findConnectors(clusterMetadata, Status.ONLINE, Operations.SQL_DIRECT);
-            for(ConnectorMetadata partialCandidate: partialCandidates){
-                connectors.put(partialCandidate.getName(), partialCandidate);
-            }
             if(candidates.isEmpty()){
-                for(ConnectorMetadata partialCandidate: partialCandidates){
-                    candidates.add(partialCandidate.getName());
-                }
+                candidates.addAll(partialCandidates);
             } else {
-                
+                candidates.retainAll(partialCandidates);
             }
         }
+
+        if(candidates.isEmpty()){
+            throw new PlanningException("No connector was found for executing the SQL query");
+        }
+
+        ConnectorMetadata connectorMetadata = MetadataManager.MANAGER.getConnector(candidates.iterator().next());
 
         ExecutionType execType = ExecutionType.SQL_INSERT;
         if(sqlValidatedQuery.getStatement() instanceof SelectSqlStatement){
@@ -218,6 +219,7 @@ public class Planner {
 
         sqlWorkflow = new SqlWorkflow(queryId, connectorMetadata.getActorRef(), execType, ResultType.RESULTS);
         sqlWorkflow.setSqlQuery(sqlValidatedQuery.getQuery());
+        sqlWorkflow.setClusterName(clusterMetadata.getName());
 
         return sqlWorkflow;
     }
@@ -463,7 +465,7 @@ public class Planner {
         ConnectorMetadata highestPriorityConnector = null;
         int minPriority = Integer.MAX_VALUE;
 
-        for (ConnectorMetadata connector : connectors) {
+        for (ConnectorMetadata connector: connectors) {
             if(connector.getPriorityFromClusterNames(clusters) < minPriority){
                 minPriority = connector.getPriorityFromClusterNames(clusters);
                 highestPriorityConnector = connector;
@@ -1721,5 +1723,27 @@ public class Planner {
         ConnectorMetadata connectorMetadata = findAnyConnector(clusterMetadata, status, requiredOperations);
         return StringUtils.getAkkaActorRefUri(connectorMetadata.getActorRef());
     }
+
+    private Set<ConnectorName> findConnectors(
+            ClusterMetadata clusterMetadata,
+            Status status,
+            Operations... requiredOperations) {
+        Set<ConnectorName> connectors = new HashSet<>();
+
+        Map<ConnectorName, ConnectorAttachedMetadata> connectorAttachedRefs =
+                clusterMetadata.getConnectorAttachedRefs();
+
+        Iterator it = connectorAttachedRefs.keySet().iterator();
+        while (it.hasNext()) {
+            ConnectorName connectorName = (ConnectorName) it.next();
+            ConnectorMetadata connectorMetadata = MetadataManager.MANAGER.getConnector(connectorName);
+            if ((connectorMetadata.getStatus() == status) &&
+                    connectorMetadata.getSupportedOperations().containsAll(Arrays.asList(requiredOperations))) {
+                connectors.add(connectorMetadata.getName());
+            }
+        }
+        return connectors;
+    }
+
 
 }

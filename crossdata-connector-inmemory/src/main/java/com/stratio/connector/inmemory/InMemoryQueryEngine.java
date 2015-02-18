@@ -35,6 +35,7 @@ import com.stratio.connector.inmemory.datastore.selector.InMemorySelector;
 import com.stratio.crossdata.common.connector.IQueryEngine;
 import com.stratio.crossdata.common.connector.IResultHandler;
 import com.stratio.crossdata.common.data.Cell;
+import com.stratio.crossdata.common.data.ClusterName;
 import com.stratio.crossdata.common.data.ColumnName;
 import com.stratio.crossdata.common.data.ResultSet;
 import com.stratio.crossdata.common.data.Row;
@@ -432,5 +433,10 @@ public class InMemoryQueryEngine implements IQueryEngine{
     @Override
     public void stop(String queryId) throws ConnectorException {
         throw new UnsupportedException("Stopping running queries is not supported");
+    }
+
+    @Override
+    public QueryResult selectSQL(ClusterName targetCluster, String sqlQuery) throws ConnectorException {
+        throw new UnsupportedException("SQL select queries are not supported");
     }
 }

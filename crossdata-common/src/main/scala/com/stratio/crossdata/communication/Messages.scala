@@ -180,4 +180,14 @@ case class AttachConnector(override val queryId: String, targetCluster: ClusterN
 case class DetachConnector(override val queryId: String, targetCluster: ClusterName,
                            connectorName: ConnectorName) extends ManagementOperation(queryId)
 
+// ============================================================================
+//                                ISqlEngine
+// ============================================================================
+
+sealed abstract class SqlOperation(queryId: String) extends Operation(queryId)
+
+case class SqlInsert(override val queryId: String, targetCluster: ClusterName, sqlQuery: String) extends SqlOperation(queryId)
+
+case class SqlSelect(override val queryId: String, targetCluster: ClusterName, sqlQuery: String) extends SqlOperation(queryId)
+
 

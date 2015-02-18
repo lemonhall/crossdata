@@ -23,7 +23,7 @@ import com.stratio.crossdata.common.connector.ConnectorClusterConfig
 import com.stratio.crossdata.common.data
 import com.stratio.crossdata.common.data.ConnectorName
 import com.stratio.crossdata.common.exceptions.ExecutionException
-import com.stratio.crossdata.common.executionplan.{ExecutionType, ManagementWorkflow, MetadataWorkflow, QueryWorkflow, ResultType, StorageWorkflow}
+import com.stratio.crossdata.common.executionplan._
 import com.stratio.crossdata.common.result._
 import com.stratio.crossdata.common.utils.StringUtils
 import com.stratio.crossdata.communication._
@@ -368,6 +368,20 @@ class CoordinatorActor(connectorMgr: ActorRef, coordinator: Coordinator) extends
 
           }
         }
+
+        case sqlWorkflow: SqlWorkflow => {
+          log.debug("CoordinatorActor: SqlWorkflow received")
+          val queryId = plannedQuery.getQueryId
+          val executionInfo = new ExecutionInfo
+          executionInfo.setSender(StringUtils.getAkkaActorRefUri(sender))
+          executionInfo.setWorkflow(sqlWorkflow)
+          executionInfo.setQueryStatus(QueryStatus.IN_PROGRESS)
+          ExecutionManager.MANAGER.createEntry(queryId, executionInfo)
+
+          val actorRef = context.actorSelection(sqlWorkflow.getActorRef())
+          actorRef ! sqlWorkflow.getStorageOperation()
+        }
+
         case _ => {
           log.error("Non recognized workflow")
         }

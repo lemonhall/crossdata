@@ -109,4 +109,9 @@ public class InMemoryStorageEngine implements IStorageEngine{
             throw new ExecutionException("No datastore connected to " + targetCluster);
         }
     }
+
+    @Override
+    public void insertSQL(ClusterName targetCluster, String sqlQuery) throws ConnectorException {
+        throw new UnsupportedException("SQL insert queries are not supported");
+    }
 }

@@ -18,11 +18,19 @@
 
 package com.stratio.crossdata.common.executionplan;
 
+import com.stratio.crossdata.common.data.ClusterName;
+import com.stratio.crossdata.common.exceptions.validation.CoordinationException;
+import com.stratio.crossdata.communication.SqlInsert;
+import com.stratio.crossdata.communication.SqlOperation;
+import com.stratio.crossdata.communication.SqlSelect;
+
 public class SqlWorkflow extends ExecutionWorkflow {
 
     private static final long serialVersionUID = 760343968145632806L;
 
     private String sqlQuery;
+
+    private ClusterName clusterName;
 
     /**
      * Class constructor.
@@ -47,4 +55,29 @@ public class SqlWorkflow extends ExecutionWorkflow {
     public void setSqlQuery(String sqlQuery) {
         this.sqlQuery = sqlQuery;
     }
+
+    public ClusterName getClusterName() {
+        return clusterName;
+    }
+
+    public void setClusterName(ClusterName clusterName) {
+        this.clusterName = clusterName;
+    }
+
+    /**
+     * Get the SQL operation to be execution.
+     * @return A {@link com.stratio.crossdata.communication.SqlOperation}.
+     */
+    public SqlOperation getStorageOperation() throws CoordinationException {
+        SqlOperation result;
+        if(ExecutionType.SQL_INSERT.equals(this.executionType)){
+            result = new SqlInsert(queryId, clusterName, this.getSqlQuery());
+        } else if(ExecutionType.SQL_SELECT.equals(this.executionType)){
+            result = new SqlSelect(queryId, clusterName, this.getSqlQuery());
+        } else {
+            throw new CoordinationException("Operation " + this.executionType + " not supported yet.");
+        }
+        return result;
+    }
+
 }

@@ -288,6 +288,9 @@ class ConnectorActor(connectorName: String, conn: IConnector, connectedServers: 
     case storageOp: StorageOperation => {
       methodStorageOp(storageOp, sender)
     }
+    case sqlOp: SqlOperation => {
+      methodSqlOp(sqlOp, sender)
+    }
     case msg: getConnectorName => {
       logger.info(sender + " asked for my name: " + connectorName)
       connectedServers += sender.path.address.toString
@@ -480,6 +483,38 @@ class ConnectorActor(connectorName: String, conn: IConnector, connectedServers: 
       }
       case err: Error => {
         logger.error("Error in ConnectorActor(Receiving StorageOperation)")
+        val result = crossdata.common.result.Result.createExecutionErrorResult("Error in ConnectorActor")
+        result.setQueryId(qId)
+        s ! result
+      }
+    }
+  }
+
+  private def methodSqlOp(sqlOp: SqlOperation, s: ActorRef): Unit = {
+    val qId: String = sqlOp.queryId
+    try {
+      val storageEngine = connector.getStorageEngine
+      val queryEngine = connector.getQueryEngine
+      var result: Result = StorageResult.createSuccessfulStorageResult("SQL query inserted successfully")
+      sqlOp match {
+        case SqlInsert(queryId, clustername, sqlQuery) => {
+          storageEngine.insertSQL(clustername, sqlQuery)
+        }
+        case SqlSelect(queryId, clustername, sqlQuery) => {
+          result = queryEngine.selectSQL(clustername, sqlQuery)
+        }
+      }
+      result.setQueryId(qId)
+      s ! result
+    } catch {
+      case ex: Exception => {
+        logger.error(ex.getMessage)
+        val result = Result.createExecutionErrorResult(ex.getMessage)
+        result.setQueryId(qId)
+        s ! result
+      }
+      case err: Error => {
+        logger.error("Error in ConnectorActor(Receiving SqlOperation)")
         val result = crossdata.common.result.Result.createExecutionErrorResult("Error in ConnectorActor")
         result.setQueryId(qId)
         s ! result
